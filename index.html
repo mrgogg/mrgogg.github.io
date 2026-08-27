@@ -53,6 +53,27 @@
   .nav-links a:hover::after{width:100%;}
   a:focus-visible{outline:2px solid var(--moss);outline-offset:3px;}
 
+  .nav-toggle{
+    display:none;
+    background:none;border:none;
+    width:44px;height:44px;
+    align-items:center;justify-content:center;
+    cursor:pointer;
+  }
+  .nav-toggle span{
+    display:block;width:22px;height:2px;background:var(--ink);
+    position:relative;transition:background 0.2s ease;
+  }
+  .nav-toggle span::before, .nav-toggle span::after{
+    content:'';position:absolute;left:0;width:22px;height:2px;background:var(--ink);
+    transition:transform 0.25s ease, top 0.25s ease;
+  }
+  .nav-toggle span::before{top:-7px;}
+  .nav-toggle span::after{top:7px;}
+  .nav-toggle.open span{background:transparent;}
+  .nav-toggle.open span::before{top:0;transform:rotate(45deg);}
+  .nav-toggle.open span::after{top:0;transform:rotate(-45deg);}
+
   header.hero{padding:200px 0 140px;position:relative;}
   .eyebrow{
     font-family:'JetBrains Mono', monospace;font-size:0.8rem;color:var(--moss);
@@ -160,15 +181,45 @@
   .reveal.in{opacity:1;transform:translateY(0);}
 
   @media (max-width:760px){
-    header.hero{padding:150px 0 90px;}
+    .wrap{padding:0 24px;}
+    header.hero{padding:130px 0 70px;}
     .about-grid{grid-template-columns:1fr;gap:32px;}
     .focus-grid{grid-template-columns:1fr;gap:32px;}
     .process-grid{grid-template-columns:1fr;gap:28px;}
     .strength-grid{grid-template-columns:1fr;}
-    .acc-row{grid-template-columns:1fr;gap:10px;}
-    .nav-links{gap:16px;}
-    .hero-meta{gap:28px;}
-    section{padding:80px 0;}
+    .acc-row{grid-template-columns:1fr;gap:8px;}
+    .acc-title{font-size:1.25rem;}
+
+    .nav-toggle{display:flex;}
+    .nav-links{
+      display:flex;flex-direction:column;
+      position:fixed;top:72px;left:0;right:0;bottom:0;
+      background:var(--paper);
+      padding:32px 24px;
+      gap:0;
+      transform:translateX(100%);
+      transition:transform 0.3s ease;
+      font-size:1.1rem;
+    }
+    .nav-links.open{transform:translateX(0);}
+    .nav-links a{padding:16px 0;border-bottom:1px solid var(--line);}
+
+    .hero-meta{flex-direction:column;gap:18px;margin-top:40px;}
+    .btn{width:100%;justify-content:center;margin-top:36px;padding:16px 26px;}
+
+    section{padding:64px 0;}
+    .section-label{margin-bottom:14px;}
+
+    .focus-card p{max-width:none;}
+    .strength-item p{max-width:none;}
+
+    .contact-inner h2{font-size:2rem;}
+    footer .wrap{flex-direction:column;gap:6px;}
+  }
+
+  @media (max-width:420px){
+    h1.hero-name{font-size:2.3rem;}
+    .pill{font-size:0.76rem;padding:9px 14px;}
   }
 </style>
 </head>
@@ -177,13 +228,16 @@
 <nav>
   <div class="wrap">
     <div class="nav-mark">George Street</div>
-    <div class="nav-links">
+    <div class="nav-links" id="navLinks">
       <a href="#testing">testing</a>
       <a href="#process">process</a>
       <a href="#about">about</a>
       <a href="#skills">skills</a>
       <a href="#contact">contact</a>
     </div>
+    <button class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false">
+      <span></span>
+    </button>
   </div>
 </nav>
 
@@ -383,6 +437,22 @@
     });
   },{threshold:0.15});
   reveals.forEach(r=>io.observe(r));
+
+  // Mobile nav toggle
+  const navToggle = document.getElementById('navToggle');
+  const navLinks = document.getElementById('navLinks');
+  navToggle.addEventListener('click', ()=>{
+    const isOpen = navLinks.classList.toggle('open');
+    navToggle.classList.toggle('open');
+    navToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+  });
+  navLinks.querySelectorAll('a').forEach(link=>{
+    link.addEventListener('click', ()=>{
+      navLinks.classList.remove('open');
+      navToggle.classList.remove('open');
+      navToggle.setAttribute('aria-expanded','false');
+    });
+  });
 </script>
 
 </body>
